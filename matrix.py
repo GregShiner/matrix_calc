@@ -1,5 +1,6 @@
 import numpy as np
 from operator import add
+from fractions import Fraction
 
 
 class Matrix(np.ndarray):
@@ -39,7 +40,7 @@ class Matrix(np.ndarray):
                     new_matrix[i, j] += self[i, k] * other[k, j]
         return new_matrix
 
-    def scale(self, scalar: float) -> "Matrix":
+    def scale(self, scalar: Fraction) -> "Matrix":
         new_matrix = Matrix(shape=self.shape)
         # multiply self by scalar and store in new_matrix
         for i in range(self.rows):
@@ -47,11 +48,11 @@ class Matrix(np.ndarray):
                 new_matrix[i, j] = self[i, j] * scalar
         return new_matrix
 
-    def calc_scale_row(self, row: int, scalar: float) -> list:
+    def calc_scale_row(self, row: int, scalar: Fraction) -> list:
         return [self[row, i] * scalar for i in range(self.columns)]
 
 
-    def scale_row(self, row: int, scalar: float) -> None:
+    def scale_row(self, row: int, scalar: Fraction) -> None:
         for i in range(len(self[row])):
             self[row, i] *= scalar
     
@@ -59,6 +60,19 @@ class Matrix(np.ndarray):
         self[[row1, row2]] = self[[row2, row1]]
 
     def add_row(
-        self, row1: int, row2: int, outrow: int, scalar1: float = 1, scalar2: float = 1
+        self, row1: int, row2: int, outrow: int, scalar1: Fraction = Fraction(1), scalar2: Fraction = Fraction(1)
     ) -> None:
         self[outrow] = list(map(add, self.calc_scale_row(row1, scalar1), self.calc_scale_row(row2, scalar2)))
+    
+    def __str__(self):
+        string_matrix = []
+        string_row = []
+        for row in self:
+            for entry in row:
+                if entry.denominator != 1:
+                    string_row.append(f"{entry.numerator}/{entry.denominator}")
+                else:
+                    string_row.append(str(entry.numerator))
+            string_matrix.append(string_row)
+            string_row = []
+        return '\n'.join(['\t'.join([str(cell) for cell in row]) for row in string_matrix])
