@@ -1,23 +1,24 @@
 from matrix import Matrix
+from fractions import Fraction
 
 
 def load_matrix_file(filename: str) -> Matrix:
     with open(filename) as f:
         rows = f.readlines()
-    matrix = Matrix(shape=(len(rows), len(rows[0].split())))
+    matrix = Matrix(shape=(len(rows), len(rows[0].split())), dtype=Fraction)
     for i, row in enumerate(rows):
         for j, value in enumerate(row.split()):
-            matrix[i, j] = float(value)
+            matrix[i, j] = Fraction(value)
     return matrix
 
 def load_matrix_cli() -> Matrix:
     rows = int(input("Enter the number of rows: "))
     columns = int(input("Enter the number of columns: "))
-    matrix = Matrix(shape=(rows, columns))
+    matrix = Matrix(shape=(rows, columns), dtype=Fraction)
     for i in range(rows):
         input = input(f"Enter row {i + 1}: ").split()
         for j, value in enumerate(input):
-            matrix[i, j] = float(value)
+            matrix[i, j] = Fraction(value)
     return matrix
 
 def write_matrix_file(filename: str, matrix: Matrix) -> None:
@@ -50,15 +51,15 @@ def main() -> None:
                 print("No matrix loaded")
                 continue
             row = int(input("Enter row: "))
-            scalar = float(input("Enter scalar: "))
+            scalar = Fraction(input("Enter scalar: "))
             matrix.scale_row(row-1, scalar)
         elif choice == 3:
             if matrix is None:
                 print("No matrix loaded")
                 continue
-            scalar1 = float(input("Enter scalar 1: "))
+            scalar1 = Fraction(input("Enter scalar 1: "))
             row1 = int(input("Enter row 1: "))
-            scalar2 = float(input("Enter scalar 2: "))
+            scalar2 = Fraction(input("Enter scalar 2: "))
             row2 = int(input("Enter row 2: "))
             out_row = int(input("Enter output row: "))
             matrix.add_row(row1-1, row2-1, out_row-1, scalar1, scalar2)
