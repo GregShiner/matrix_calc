@@ -4,3 +4,6 @@ lib64/
 share/
 bin/
 include/
+__pycache__/
+lib64
+matrix*.txt
