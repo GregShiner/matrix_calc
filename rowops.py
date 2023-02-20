@@ -17,6 +17,8 @@ def load_matrix_cli() -> Matrix:
     matrix = Matrix(shape=(rows, columns), dtype=Fraction)
     for i in range(rows):
         row = input(f"Enter row {i + 1}: ").split()
+        if len(row) != columns:
+            raise ValueError()
         for j, value in enumerate(row):
             matrix[i, j] = Fraction(value)
     return matrix
@@ -37,44 +39,87 @@ def main() -> None:
         print("4. Load from file")
         print("5. Load from CLI")
         print("6. Write to file")
-        print("7. Exit")
-        choice = int(input("Enter your choice: "))
+        print("7. Help")
+        print("8. Exit")
+        try:
+            choice = int(input("Enter your choice: "))
+        except Exception as e:
+            print("An unknown error has occurred. Please try again.")
+            print(e)
+            continue
         if choice == 1:
-            if matrix is None:
-                print("No matrix loaded")
-                continue
-            row1 = int(input("Enter row 1: "))
-            row2 = int(input("Enter row 2: "))
-            matrix.swap(row1-1, row2-1)
+            try:
+                if matrix is None:
+                    print("No matrix loaded")
+                    continue
+                row1 = int(input("Enter row i: "))
+                row2 = int(input("Enter row j: "))
+                matrix.swap(row1-1, row2-1)
+            except Exception as e:
+                print("An unknown error has occurred. Please try again.")
+                print(e)
         elif choice == 2:
-            if matrix is None:
-                print("No matrix loaded")
-                continue
-            row = int(input("Enter row: "))
-            scalar = Fraction(input("Enter scalar: "))
-            matrix.scale_row(row-1, scalar)
+            try:
+                if matrix is None:
+                    print("No matrix loaded")
+                    continue
+                row = int(input("Enter row: "))
+                scalar = Fraction(input("Enter scalar: "))
+                matrix.scale_row(row-1, scalar)
+            except Exception as e:
+                print("An unknown error has occurred. Please try again.")
+                print(e)
         elif choice == 3:
-            if matrix is None:
-                print("No matrix loaded")
-                continue
-            scalar1 = Fraction(input("Enter scalar 1: "))
-            row1 = int(input("Enter row 1: "))
-            scalar2 = Fraction(input("Enter scalar 2: "))
-            row2 = int(input("Enter row 2: "))
-            out_row = int(input("Enter output row: "))
-            matrix.add_row(row1-1, row2-1, out_row-1, scalar1, scalar2)
+            try:
+                if matrix is None:
+                    print("No matrix loaded")
+                    continue
+                scalar1 = Fraction(input("Enter scalar for row i: "))
+                row1 = int(input("Enter row i: "))
+                scalar2 = Fraction(input("Enter scalar for row j: "))
+                row2 = int(input("Enter row j: "))
+                out_row = int(input("Enter output row: "))
+                if (out_row != row1) or (out_row != row2):
+                    print("The output row must be either i or j")
+                    continue
+                matrix.add_row(row1-1, row2-1, out_row-1, scalar1, scalar2)
+            except Exception as e:
+                print("An unknown error has occurred. Please try again.")
+                print(e)
         elif choice == 4:
             filename = input("Enter filename: ")
-            matrix = load_matrix_file(filename)
+            try:
+                matrix = load_matrix_file(filename)
+            except FileNotFoundError:
+                print("File not found. Please try again.")
+            except Exception as e:
+                print("An unknown error occurred, please try again.:")
+                print(e)
         elif choice == 5:
-            matrix = load_matrix_cli()
+            try:
+                matrix = load_matrix_cli()
+            except ValueError as e:
+                print("You did not input the correct number of values")
+            except Exception as e:
+                print("An unknown error occurred, please try again.:")
+                print(e)
         elif choice == 6:
-            if matrix is None:
-                print("No matrix loaded")
-                continue
-            filename = input("Enter filename: ")
-            write_matrix_file(filename, matrix)
+            try:
+                if matrix is None:
+                    print("No matrix loaded")
+                    continue
+                filename = input("Enter filename: ")
+                write_matrix_file(filename, matrix)
+            except Exception as e:
+                print("An unknown error has occurred. Please try again.")
+                print(e)
         elif choice == 7:
+            try:
+                with open("helptext.txt", "r") as f:
+                    print(f.read())
+            except Exception as e:
+                print("An unknown error has occurred. Please try again.")
+        elif choice == 8:
             break
         else:
             print("Invalid choice")
