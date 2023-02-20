@@ -7,3 +7,6 @@ include/
 __pycache__/
 lib64
 matrix*.txt
+*.spec
+build/
+dist/

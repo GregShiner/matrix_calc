@@ -16,8 +16,8 @@ def load_matrix_cli() -> Matrix:
     columns = int(input("Enter the number of columns: "))
     matrix = Matrix(shape=(rows, columns), dtype=Fraction)
     for i in range(rows):
-        input = input(f"Enter row {i + 1}: ").split()
-        for j, value in enumerate(input):
+        row = input(f"Enter row {i + 1}: ").split()
+        for j, value in enumerate(row):
             matrix[i, j] = Fraction(value)
     return matrix
 
