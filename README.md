@@ -47,3 +47,19 @@ You can run `deactivate` to deactivate the virtual environment.
 4. Run the program
 
 `python matrix_calc.py`
+
+# Compilation
+
+If you want to compile the program into an executable, you can use pyinstaller.
+
+WARNING: You must be in a virtual environment to compile the program.
+
+`pip install pyinstaller`
+
+## Linux/Unix/MacOS
+`pyinstaller --clean -F -p "./lib/python3.9/site-packages/" -c rowops.py`
+
+(replace python3.9 with your python version)
+
+## Windows
+`pyinstaller --clean -F -p ".\Lib\site-packages\" -c rowops.py`
