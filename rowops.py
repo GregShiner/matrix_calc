@@ -1,5 +1,6 @@
 from matrix import Matrix
 from fractions import Fraction
+import help
 
 
 def load_matrix_file(filename: str) -> Matrix:
@@ -114,16 +115,20 @@ def main() -> None:
                 print("An unknown error has occurred. Please try again.")
                 print(e)
         elif choice == 7:
+            choice = input("Select an option number to view help for that option, or enter -1 to get help for the entire program: ")
             try:
-                with open("helptext.txt", "r") as f:
-                    print(f.read())
+                choice = int(choice)
+                if choice == -1:
+                    print(help.help())
+                else:
+                    print(help.option_help(choice))
             except Exception as e:
                 print("An unknown error has occurred. Please try again.")
         elif choice == 8:
             break
         else:
             print("Invalid choice")
-        print(matrix)
+        if matrix: print(matrix)
 
 if __name__ == "__main__":
     main()

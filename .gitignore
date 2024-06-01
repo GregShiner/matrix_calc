@@ -10,3 +10,4 @@ matrix*.txt
 *.spec
 build/
 dist/
+Scripts/
