@@ -1,34 +1,41 @@
 from matrix import Matrix
 from fractions import Fraction
+from rowops import load_matrix_file, load_matrix_cli, write_matrix_file
 
-
-def load_matrix_file(filename: str) -> Matrix:
-    with open(filename) as f:
-        rows = f.readlines()
-    matrix = Matrix(shape=(len(rows), len(rows[0].split())), dtype=Fraction)
-    for i, row in enumerate(rows):
-        for j, value in enumerate(row.split()):
-            matrix[i, j] = Fraction(value)
+def simplex_iteration(matrix: Matrix) -> Matrix:
+    # find pivot column
+    pivot_column = 0
+    # for each column except the last
+    # TODO: check if this needs to be -2
+    for i in range(matrix.columns - 1):
+        # if the value in the last row is less than the current minimum
+        if matrix[matrix.rows - 1, i] < matrix[matrix.rows - 1, pivot_column]:
+            pivot_column = i
+    # find pivot row
+    # find the row with the minimum non-negative ratio of matrix[i, matrix.columns - 1] / matrix[i, pivot_column]
+    theta_ratios = []
+    for i in range(matrix.rows - 1): # Don't check the objective function row
+        if matrix[i, pivot_column] == 0:
+            theta_ratios.append((i, float('inf')))
+        else:
+            theta_ratios.append((i, matrix[i, matrix.columns - 1] / matrix[i, pivot_column]))
+    theta_ratios = list(filter(lambda x: x[1] >= 0, theta_ratios))
+    if len(theta_ratios) == 0:
+        print("Unbounded solution")
+        return matrix
+    pivot_row = min(theta_ratios, key=lambda x: x[1])[0]
+    
+    # scale pivot row
+    print(f"R{pivot_row + 1} / {matrix[pivot_row, pivot_column]} -> R{pivot_row + 1}")
+    matrix.scale_row(pivot_row, Fraction(1, matrix[pivot_row, pivot_column]))
+    # print the row op
+    # scale other rows
+    for i in range(matrix.rows):
+        if i == pivot_row:
+            continue
+        print(f"{-matrix[i, pivot_column]} * R{pivot_row + 1} + R{i + 1} -> R{i + 1}")
+        matrix.add_row(pivot_row, i, i, Fraction(-matrix[i, pivot_column]), Fraction(1))
     return matrix
-
-def load_matrix_cli() -> Matrix:
-    rows = int(input("Enter the number of rows: "))
-    columns = int(input("Enter the number of columns: "))
-    matrix = Matrix(shape=(rows, columns), dtype=Fraction)
-    for i in range(rows):
-        row = input(f"Enter row {i + 1}: ").split()
-        if len(row) != columns:
-            raise ValueError()
-        for j, value in enumerate(row):
-            matrix[i, j] = Fraction(value)
-    return matrix
-
-def write_matrix_file(filename: str, matrix: Matrix) -> None:
-    with open(filename, "w") as f:
-        for i in range(matrix.rows):
-            for j in range(matrix.columns):
-                f.write(str(matrix[i, j]) + " ")
-            f.write("\n")
 
 def main() -> None:
     matrix: Matrix = None # type: ignore
@@ -40,7 +47,8 @@ def main() -> None:
         print("5. Load from CLI")
         print("6. Write to file")
         print("7. Help")
-        print("8. Exit")
+        print("8. Simplex")
+        print("9. Exit")
         try:
             choice = int(input("Enter your choice: "))
         except Exception as e:
@@ -87,7 +95,7 @@ def main() -> None:
                 print("An unknown error has occurred. Please try again.")
                 print(e)
         elif choice == 4:
-            filename = input("Enter filename: ")
+            filename = input("Enter filename: ") or "matrix.txt"
             try:
                 matrix = load_matrix_file(filename)
             except FileNotFoundError:
@@ -120,6 +128,23 @@ def main() -> None:
             except Exception as e:
                 print("An unknown error has occurred. Please try again.")
         elif choice == 8:
+            try:
+                if matrix is None:
+                    print("No matrix loaded")
+                    continue
+                while(True):
+                    print(matrix)
+                    choice = input("Enter 'n' to continue, or 'q' to quit: ")
+                    if choice == 'n':
+                        matrix = simplex_iteration(matrix)
+                    elif choice == 'q':
+                        break
+                    else:
+                        print("Invalid choice")
+            except Exception as e:
+                print("An unknown error has occurred. Please try again.")
+                print(e)
+        elif choice == 9:
             break
         else:
             print("Invalid choice")
